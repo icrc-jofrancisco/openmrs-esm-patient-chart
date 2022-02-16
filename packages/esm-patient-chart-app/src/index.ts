@@ -1,4 +1,5 @@
 import capitalize from 'lodash-es/capitalize';
+import replace from 'lodash-es/replace';
 import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schemas/openmrs-esm-patient-chart-schema';
@@ -24,7 +25,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:view/:subview?`,
-      title: ([_, key]) => `${capitalize(key)} Dashboard`,
+      title: ([_, key]) => `${capitalize(replace(key, /_/g, ' '))} dashboard`,
       parent: spaBasePath,
     },
   ]);
@@ -109,7 +110,6 @@ function setupOpenMRS() {
           view: 'visits',
         },
       },
-      ,
       {
         id: 'past-visits-overview',
         load: getAsyncLifecycle(() => import('./visit/past-visit-overview.component'), {
