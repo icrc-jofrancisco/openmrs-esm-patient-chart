@@ -20,19 +20,17 @@ import {
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
 import {
-  getStartedVisit,
   saveVisit,
   showNotification,
   showToast,
   useLocations,
   useSessionUser,
-  VisitMode,
-  VisitStatus,
   ExtensionSlot,
   NewVisitPayload,
   toOmrsIsoString,
   toDateObjectStrict,
   useLayoutType,
+  useVisit,
 } from '@openmrs/esm-framework';
 import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import VisitTypeOverview from './visit-type-overview.component';
@@ -52,6 +50,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [visitType, setVisitType] = useState<string | null>(null);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const { mutate } = useVisit(patientUuid);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -90,13 +89,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           (response) => {
             if (response.status === 201) {
               closeWorkspace();
-
-              getStartedVisit.next({
-                mode: VisitMode?.NEWVISIT,
-                visitData: response.data,
-                status: VisitStatus?.ONGOING,
-              });
-
+              mutate();
               showToast({
                 kind: 'success',
                 description: t('startVisitSuccessfully', 'Visit started successfully'),
